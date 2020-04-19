@@ -24,8 +24,6 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -54,7 +52,7 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
         String descData = blogList.get(position).getDescription();
         holder.setDescriptionView(descData);
 
@@ -93,12 +91,11 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
                 if(documentSnapshots != null && !documentSnapshots.isEmpty()){
 
                     int count = documentSnapshots.size();
-                    Log.d(TAG, "onEvent: size "+count);
 
                     holder.updateLikesCount(count);
 
                 } else {
-                    Log.d(TAG, "onEvent: size "+0);
+
                     holder.updateLikesCount(0);
 
                 }
@@ -130,17 +127,16 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
 
-                        if(!task.getResult().exists()){
-
+                        if(task.getResult() != null && !task.getResult().exists()){
+                            Log.d(TAG, "onComplete: blogPostId : "+blogPostId);
+                            Log.d(TAG, "onComplete: position : "+position);
                             HashMap<String, Object> likesMap = new HashMap<>();
                             likesMap.put("timestamp", FieldValue.serverTimestamp());
 
                             mFirestore.collection("posts/" + blogPostId + "/likes").document(currentUserId).set(likesMap);
 
                         } else {
-
                             mFirestore.collection("posts/" + blogPostId + "/likes").document(currentUserId).delete();
-
                         }
 
                     }
@@ -157,9 +153,6 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
     class ViewHolder extends RecyclerView.ViewHolder {
         private View mView;
-        private ImageView mImageView;
-        private ImageView mUserProfile;
-        private TextView userName;
         private ImageView blogLikeBtn;
         ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -177,23 +170,23 @@ public class BlogRecyclerAdapter extends RecyclerView.Adapter<BlogRecyclerAdapte
 
         void setImage(String downloadUrl, String thumbUrl){
 
-            mImageView = mView.findViewById(R.id.post_image);
+            ImageView imageView = mView.findViewById(R.id.post_image);
 
             RequestOptions requestOptions = new RequestOptions();
             requestOptions.placeholder(R.drawable.default_image_placeholder_2);
 
             Glide.with(mContext).applyDefaultRequestOptions(requestOptions).load(downloadUrl).thumbnail(
                     Glide.with(mContext).load(thumbUrl)
-            ).into(mImageView);
+            ).into(imageView);
         }
 
         void setProfile(String name, String profileUrl){
-            mUserProfile = mView.findViewById(R.id.post_user_image);
-            userName = mView.findViewById(R.id.post_username);
+            ImageView userProfile = mView.findViewById(R.id.post_user_image);
+            TextView userName = mView.findViewById(R.id.post_username);
 
             userName.setText(name);
 
-            Glide.with(mContext).load(profileUrl).into(mUserProfile);
+            Glide.with(mContext).load(profileUrl).into(userProfile);
 
         }
 
