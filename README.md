@@ -13,4 +13,4 @@ To become an Android developer, you must know how to bring particular mobile exp
 - [Account Setting Activity](https://github.com/aayush287/Blog/blob/master/Screenshots/Screenshot_2020-06-16-07-06-49-921_com.eyev.blog.png)
 
 ## Instruction
- Clone project and add your `google-servie.json` file in `app` 
+ Clone project and add your `google-servie.json` file in `app` folder. 
